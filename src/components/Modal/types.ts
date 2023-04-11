@@ -1,10 +1,12 @@
-import { ChangeEventHandler } from "react";
+import { ModalProps } from "@chakra-ui/react";
+import { CSSProperties, ChangeEventHandler, ReactElement } from "react";
 
-export type EditRoomModalProps = {
+export interface EditRoomModalProps extends ModalProps {
   isOpen: boolean;
-  buttonText?: string;
   value: string;
+  modalContentStyle?: CSSProperties;
+  modalTitle: string;
+  footerComponent?: ReactElement;
   onChangeValue: (event: ChangeEventHandler<HTMLSelectElement>) => void;
   onClose: () => void;
-  onSubmit: () => void;
-};
+}
