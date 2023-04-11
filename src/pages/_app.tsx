@@ -10,7 +10,7 @@ const colors = {
   },
 };
 
-const theme = extendTheme({ colors });
+export const theme = extendTheme({ colors });
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (

@@ -1,5 +1,6 @@
-import { Input, Button, InputRightElement } from "@chakra-ui/react";
+import { Input, Button, InputRightElement, InputGroup } from "@chakra-ui/react";
 import { InputProps } from "./types";
+import styled from "@emotion/styled";
 
 function ChatInput({
   errorBorderColor,
@@ -10,7 +11,7 @@ function ChatInput({
   ...rest
 }: InputProps) {
   return (
-    <>
+    <InputGroup>
       <Input
         colorScheme={colorScheme}
         errorBorderColor={errorBorderColor}
@@ -19,11 +20,21 @@ function ChatInput({
         _placeholder={placeholderStyle}
         {...rest}
       />
-      <InputRightElement pointerEvents="none">
-        <Button size="sm">전송</Button>
-      </InputRightElement>
-    </>
+      <InputRightContainer>
+        <Button>전송</Button>
+      </InputRightContainer>
+    </InputGroup>
   );
 }
 
 export default ChatInput;
+
+const InputRightContainer = styled(InputRightElement)`
+  top: 4px;
+  right: 6px;
+  width: 80px;
+
+  button {
+    width: 80px;
+  }
+`;

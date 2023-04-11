@@ -23,7 +23,7 @@ export interface InputProps
   focusBorderColor?: string;
   htmlSize?: number;
   isDisabled?: boolean;
-  isInValid?: boolean;
+  isInvalid?: boolean;
   isReadonly?: boolean;
   isRequired?: boolean;
   variant?: "outline" | "filled" | "flushed" | "unstyled";
@@ -33,4 +33,5 @@ export interface InputProps
 
 export interface InputBoxProps extends InputProps {
   label?: string;
+  errorText?: string;
 }
