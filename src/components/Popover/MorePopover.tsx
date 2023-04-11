@@ -8,24 +8,38 @@ import {
 import { MorePopoverProps } from "./types";
 import styled from "@emotion/styled";
 
-function MorePopover({ triggerElement, bodyContents }: MorePopoverProps) {
+function MorePopover({
+  triggerElement,
+  bodyContents,
+  buttonSize = "md",
+  placement = "bottom",
+}: MorePopoverProps) {
   return (
-    <Popover>
+    <Popover placement={placement}>
       <PopoverTrigger>{triggerElement}</PopoverTrigger>
-      <PopoverContent>
+      <Content>
         <BodyContainer>
           {bodyContents?.map((content) => (
-            <Button key={content.text} onClick={content?.onClick}>
+            <Button
+              key={content.text}
+              size={buttonSize}
+              style={content?.style}
+              onClick={content?.onClick}
+            >
               {content.text}
             </Button>
           ))}
         </BodyContainer>
-      </PopoverContent>
+      </Content>
     </Popover>
   );
 }
 
 export default MorePopover;
+
+const Content = styled(PopoverContent)`
+  width: auto;
+`;
 
 const BodyContainer = styled(PopoverBody)`
   display: flex;
