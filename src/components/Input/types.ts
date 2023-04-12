@@ -35,3 +35,9 @@ export interface InputBoxProps extends InputProps {
   label?: string;
   errorText?: string;
 }
+
+export type InputBoxHandle = {
+  getInputValue: () => string;
+  setInputValue: (value: string) => void;
+  clearInput: () => void;
+};

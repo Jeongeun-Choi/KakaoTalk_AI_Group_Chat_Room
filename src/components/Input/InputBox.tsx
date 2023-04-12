@@ -1,29 +1,59 @@
-import { Input, Text } from "@chakra-ui/react";
+/* eslint-disable react/display-name */
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { Box, Input, Text } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 
-import { InputBoxProps } from "./types";
+import { InputBoxHandle, InputBoxProps } from "./types";
 
-function InputBox({
-  label,
-  placeholder,
-  placeholderStyle,
-  isInvalid,
-  errorText,
-  ...rest
-}: InputBoxProps) {
-  return (
-    <>
-      <Text>{label}</Text>
-      <Input
-        placeholder={placeholder}
-        _placeholder={placeholderStyle}
-        isInvalid={isInvalid}
-        {...rest}
-      />
-      {isInvalid && <ErrorText>{errorText}</ErrorText>}
-    </>
-  );
-}
+const InputBox = forwardRef<InputBoxHandle, InputBoxProps>(
+  (
+    { label, placeholder, placeholderStyle, isInvalid, errorText, ...rest },
+    ref
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        getInputValue: () => {
+          if (!inputRef.current) {
+            return "";
+          }
+
+          return inputRef.current.value;
+        },
+        setInputValue: (value: string) => {
+          if (!inputRef.current) {
+            return;
+          }
+
+          inputRef.current.value = value;
+        },
+        clearInput: () => {
+          if (!inputRef.current) {
+            return;
+          }
+          inputRef.current.value = "";
+        },
+      }),
+      [inputRef]
+    );
+
+    return (
+      <Box>
+        <Text>{label}</Text>
+        <Input
+          ref={inputRef}
+          placeholder={placeholder}
+          _placeholder={placeholderStyle}
+          isInvalid={isInvalid}
+          {...rest}
+        />
+        {isInvalid && <ErrorText>{errorText}</ErrorText>}
+      </Box>
+    );
+  }
+);
 
 export default InputBox;
 
