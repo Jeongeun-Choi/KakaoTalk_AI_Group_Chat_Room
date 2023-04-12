@@ -17,13 +17,21 @@ const meta: Meta<typeof EditRoomModal> = {
 export default meta;
 type Story = StoryObj<typeof EditRoomModal>;
 
-const footerComponent = () => <Button>생성</Button>;
-
 export const NewChatRoom: Story = {
   args: {
     isOpen: true,
     modalTitle: "방 생성",
     modalContentStyle: { height: "300px" },
-    footerComponent: footerComponent(),
+    submitButtonText: "생성",
+  },
+};
+
+export const EditChatRoom: Story = {
+  args: {
+    isOpen: true,
+    modalTitle: "방 수정",
+    modalContentStyle: { height: "300px" },
+    submitButtonText: "수정",
+    editRoomName: "테스트 방",
   },
 };
