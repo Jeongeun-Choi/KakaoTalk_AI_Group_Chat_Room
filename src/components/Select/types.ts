@@ -36,5 +36,5 @@ export type SelectProps = {
 export interface SelectLabelProps extends SelectProps {
   label?: string;
   value?: string;
-  onChangeValue: (event: ChangeEventHandler<HTMLSelectElement>) => void;
+  onChangeValue: ChangeEventHandler<HTMLSelectElement>;
 }

@@ -1,5 +1,6 @@
 import { AppProps } from "next/app";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import "../styles/globalStyle.css";
 
 const colors = {
   pink: {
