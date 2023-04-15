@@ -21,7 +21,8 @@ function MorePopover({
         <BodyContainer>
           {bodyContents?.map((content) => (
             <Button
-              key={content.text}
+              key={content.id}
+              data-room-id={content.roomId}
               size={buttonSize}
               style={content?.style}
               onClick={content?.onClick}

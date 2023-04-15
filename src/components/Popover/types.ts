@@ -2,9 +2,11 @@ import { ButtonProps, PopoverProps } from "@chakra-ui/react";
 import { CSSProperties } from "react";
 
 export type BodyContentType = {
+  id: string;
+  roomId?: number;
   text: string;
   style?: CSSProperties;
-  onClick?: () => void;
+  onClick?: any;
 };
 export type MorePopoverProps = {
   triggerElement: React.ReactElement;
