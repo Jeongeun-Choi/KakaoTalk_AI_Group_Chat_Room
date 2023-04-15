@@ -1,15 +1,53 @@
-import { Box } from "@chakra-ui/react";
+import { SettingsIcon } from "@chakra-ui/icons";
+import { Box, IconButton } from "@chakra-ui/react";
 import styled from "@emotion/styled";
+import { MouseEvent, useCallback } from "react";
+import MorePopover from "../Popover/MorePopover";
 
 type ListItemProps = {
-  memberCount: number;
+  memberCount: string;
+  roomName: string;
+  roomId: number;
+  height?: string;
+  onOpenEditModal: (event: MouseEvent<HTMLButtonElement>) => void;
+  onDeleteRoom: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
-function ListItem({ memberCount }: ListItemProps) {
+const IconButtonStyle = {
+  backgroundColor: "transparent",
+};
+
+function ListItem({
+  memberCount,
+  roomName,
+  roomId,
+  height = "50px",
+  onOpenEditModal,
+  onDeleteRoom,
+}: ListItemProps) {
+  const bodyContents = [
+    { id: "edit", roomId, text: "수정", onClick: onOpenEditModal },
+    { id: "delete", roomId, text: "삭제", onClick: onDeleteRoom },
+  ];
+
+  const renderSettingIcon = useCallback(() => {
+    return (
+      <IconButton aria-label="button" style={IconButtonStyle}>
+        <SettingsIcon />
+      </IconButton>
+    );
+  }, []);
+
   return (
-    <ItemContainer>
-      <div>방 이름</div>
-      <div>[{memberCount}]</div>
+    <ItemContainer height={height}>
+      <RoomInfo>
+        <span>{roomName}</span>
+        <span>[{memberCount}]</span>
+      </RoomInfo>
+      <MorePopover
+        triggerElement={renderSettingIcon()}
+        bodyContents={bodyContents}
+      />
     </ItemContainer>
   );
 }
@@ -18,5 +56,11 @@ export default ListItem;
 
 const ItemContainer = styled(Box)`
   display: flex;
-  justify-content: space;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const RoomInfo = styled.div`
+  display: flex;
+  align-items: center;
 `;
