@@ -1,16 +1,17 @@
 import { ModalProps } from "@chakra-ui/react";
 import { CSSProperties, ChangeEventHandler } from "react";
 
-export interface EditRoomModalProps extends ModalProps {
+export type RoomInfo = {
+  roomName: string;
+  memberCount: string;
+};
+export interface EditRoomModalProps extends Omit<ModalProps, "children"> {
   isOpen: boolean;
-  roomMemberCount: string;
   editRoomName?: string;
+  editRoomInfo?: RoomInfo;
   modalContentStyle?: CSSProperties;
   modalTitle: string;
   submitButtonText: string;
-  onChangeRoomMemberCount: (
-    event: ChangeEventHandler<HTMLSelectElement>
-  ) => void;
   onClose: () => void;
-  onSubmit: (roomName: string) => void;
+  onSubmit?: (roomName: string, memberCount: string) => void;
 }

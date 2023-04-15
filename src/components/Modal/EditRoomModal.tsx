@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, ChangeEvent } from "react";
 import {
   Button,
   Modal,
@@ -17,17 +17,17 @@ import { InputBoxHandle } from "../Input/types";
 
 function EditRoomModal({
   isOpen,
-  roomMemberCount,
-  editRoomName,
+  isCentered,
+  editRoomInfo,
   modalTitle,
   modalContentStyle,
   submitButtonText,
-  onChangeRoomMemberCount,
   onClose,
   onSubmit,
 }: EditRoomModalProps) {
   const inputRef = useRef<InputBoxHandle>(null);
   const [isInvalid, setIsInvalid] = useState<boolean>(false);
+  const [roomMemberCount, setRoomMemberCount] = useState<string>("");
 
   const checkRoomNameLen = useCallback((roomName: string) => {
     const lenReg = /^(\w|\W){2,10}$/;
@@ -38,6 +38,13 @@ function EditRoomModal({
 
     return true;
   }, []);
+
+  const handleChangeRoomMemberCount = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      setRoomMemberCount(event.target.value);
+    },
+    []
+  );
 
   const handleClickSubmitButton = useCallback(() => {
     const roomName = inputRef.current?.getInputValue();
@@ -53,22 +60,27 @@ function EditRoomModal({
       return;
     }
 
-    onSubmit(roomName);
-  }, [checkRoomNameLen, onSubmit]);
+    onSubmit?.(roomName, roomMemberCount);
+  }, [checkRoomNameLen, roomMemberCount, onSubmit]);
 
   const handleFocusOn = useCallback(() => {
     setIsInvalid(false);
   }, []);
 
   useEffect(() => {
-    if (editRoomName) {
+    if (editRoomInfo?.roomName) {
       // FIXME useEffect 내부에 setTimeout 함수 쓰지 않기..
-      setTimeout(() => inputRef.current?.setInputValue(editRoomName), 0);
+      setTimeout(
+        () => inputRef.current?.setInputValue(editRoomInfo.roomName),
+        0
+      );
     }
-  }, [editRoomName]);
+
+    setRoomMemberCount(editRoomInfo?.memberCount || "");
+  }, [editRoomInfo?.roomName, editRoomInfo?.memberCount, editRoomInfo]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} isCentered={isCentered} onClose={onClose}>
       <ModalOverlay />
       <ModalContent style={modalContentStyle}>
         <ModalHeader>{modalTitle}</ModalHeader>
@@ -86,7 +98,7 @@ function EditRoomModal({
           <SelectLabel
             label="방 인원"
             value={roomMemberCount}
-            onChangeValue={onChangeRoomMemberCount}
+            onChangeValue={handleChangeRoomMemberCount}
           />
         </RoomModalBody>
         <ModalFooter>
