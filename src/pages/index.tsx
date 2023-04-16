@@ -1,6 +1,8 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { DBConfigType } from "@/globalType";
 import setIndexedDB from "@/hooks/useIndexedDBStore";
-import { useEffect } from "react";
+import { getActions } from "@/utils/db";
 
 const config: DBConfigType = {
   databaseName: "AI_CHAT",
@@ -27,10 +29,24 @@ const config: DBConfigType = {
 };
 
 function HomePage() {
+  const router = useRouter();
+
   useEffect(() => {
     setIndexedDB(config)
-      .then((res) => {
+      .then(async (res) => {
         console.log(res);
+        const { getAll } = getActions("api_key");
+
+        const apiKeys = await getAll();
+        return apiKeys;
+      })
+      .then((apiKeys: any) => {
+        if (!apiKeys) {
+          return;
+        }
+        if (apiKeys?.length > 0) {
+          router.push("/chat-list");
+        }
       })
       .catch((e) => {
         console.log(e);

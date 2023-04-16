@@ -88,11 +88,30 @@ export function getActions<T>(currentStoreName: string) {
               reject
             );
             let objectStore = transaction.objectStore(currentStoreName);
-            console.log(objectStore);
-            console.log(value);
             let request = objectStore.add(value, key);
             request.onsuccess = (e: any) => {
               resolve(e.target.result as T[]);
+            };
+          })
+          .catch(reject);
+      });
+    },
+    getAll() {
+      return new Promise((resolve, reject) => {
+        getConnection()
+          .then((db) => {
+            checkValidationTransition(db, currentStoreName, reject);
+            let transaction = createTransaction(
+              db,
+              "readonly",
+              currentStoreName,
+              resolve,
+              reject
+            );
+            const objectStore = transaction.objectStore(currentStoreName);
+            const request = objectStore.getAll();
+            request.onsuccess = (e: any) => {
+              resolve(e.target.result);
             };
           })
           .catch(reject);

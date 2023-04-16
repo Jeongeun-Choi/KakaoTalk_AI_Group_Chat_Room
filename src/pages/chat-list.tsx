@@ -3,8 +3,15 @@ import { AddIcon } from "@chakra-ui/icons";
 import ListItem from "@/components/List/ListItem";
 import { Box, IconButton } from "@chakra-ui/react";
 import EditRoomModal from "@/components/Modal/EditRoomModal";
-import { CSSProperties, MouseEvent, useCallback, useState } from "react";
+import {
+  CSSProperties,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { RoomInfo } from "@/components/Modal/types";
+import { getActions } from "@/utils/db";
 
 type ModalInfo = {
   modalType: "add" | "edit";
@@ -26,6 +33,12 @@ const chatList = [
   },
 ];
 function ChatList() {
+  const { getAll, add } = getActions<{
+    name: string;
+    memberCount: number;
+    id: 1;
+  }>("chat_room_list");
+
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     modalType: "add",
@@ -84,11 +97,19 @@ function ChatList() {
   }, []);
 
   const handleSubmitAddingRoom = useCallback(
-    (roomName: string, memberCount: string) => {
+    async (roomName: string, memberCount: string) => {
       const params = { roomName, memberCount };
       //api 요청 보내기
+
+      const response = await add({
+        name: roomName,
+        memberCount: parseInt(memberCount, 10),
+        id: 1,
+      });
+
+      console.log(response);
     },
-    []
+    [add]
   );
 
   const handleSubmitUpdatingRoom = useCallback(
@@ -113,6 +134,14 @@ function ChatList() {
     },
     []
   );
+
+  useEffect(() => {
+    getAll()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => console.error(e));
+  }, [getAll]);
 
   return (
     <>
@@ -148,6 +177,7 @@ function ChatList() {
         modalTitle={modalInfo.modalTitle}
         submitButtonText={modalInfo.submitButtonText}
         onClose={handleCloseModal}
+        onSubmit={handleSubmitAddingRoom}
       />
     </>
   );

@@ -14,7 +14,7 @@ const config: DBConfigType = {
   stores: [
     {
       name: "api_key",
-      id: { keyPath: "id", autoIncrement: true },
+      id: { keyPath: "apiKey" },
       columns: [{ name: "apiKey", keyPath: "apiKey" }],
     },
     {
@@ -50,7 +50,7 @@ function LoginPage() {
 
     try {
       console.log();
-      const response = await add({ apiKey, id: 1 });
+      const response = await add({ apiKey });
       console.log(response);
       router.push("/chat-list");
     } catch (e) {
