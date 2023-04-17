@@ -32,11 +32,15 @@ function ListItem({
 
   const renderSettingIcon = useCallback(() => {
     return (
-      <IconButton aria-label="button" style={IconButtonStyle}>
+      <IconButton
+        aria-label="button"
+        style={IconButtonStyle}
+        data-room-id={roomId}
+      >
         <SettingsIcon />
       </IconButton>
     );
-  }, []);
+  }, [roomId]);
 
   return (
     <ItemContainer height={height}>

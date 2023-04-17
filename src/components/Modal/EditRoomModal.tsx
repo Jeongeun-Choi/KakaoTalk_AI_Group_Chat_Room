@@ -60,24 +60,25 @@ function EditRoomModal({
       return;
     }
 
-    onSubmit?.(roomName, roomMemberCount);
-  }, [checkRoomNameLen, roomMemberCount, onSubmit]);
+    onSubmit?.({
+      name: roomName,
+      memberCount: roomMemberCount,
+      id: editRoomInfo?.id || 0,
+    });
+  }, [checkRoomNameLen, roomMemberCount, onSubmit, editRoomInfo?.id]);
 
   const handleFocusOn = useCallback(() => {
     setIsInvalid(false);
   }, []);
 
   useEffect(() => {
-    if (editRoomInfo?.roomName) {
+    if (editRoomInfo?.name) {
       // FIXME useEffect 내부에 setTimeout 함수 쓰지 않기..
-      setTimeout(
-        () => inputRef.current?.setInputValue(editRoomInfo.roomName),
-        0
-      );
+      setTimeout(() => inputRef.current?.setInputValue(editRoomInfo.name), 0);
     }
 
     setRoomMemberCount(editRoomInfo?.memberCount || "");
-  }, [editRoomInfo?.roomName, editRoomInfo?.memberCount, editRoomInfo]);
+  }, [editRoomInfo?.name, editRoomInfo?.memberCount, editRoomInfo]);
 
   return (
     <Modal isOpen={isOpen} isCentered={isCentered} onClose={onClose}>

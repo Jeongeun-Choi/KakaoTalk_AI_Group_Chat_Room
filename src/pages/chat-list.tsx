@@ -20,6 +20,12 @@ type ModalInfo = {
   submitButtonText: string;
 };
 
+type ChatRoomType = {
+  id?: number;
+  name: string;
+  memberCount: string;
+};
+
 const chatList = [
   {
     id: 1,
@@ -33,22 +39,25 @@ const chatList = [
   },
 ];
 function ChatList() {
-  const { getAll, add } = getActions<{
-    name: string;
-    memberCount: number;
-    id: 1;
-  }>("chat_room_list");
+  const { getAll, add, update } = getActions<ChatRoomType>("chat_room_list");
 
+  const [chatRoomList, setChatRoomList] = useState<ChatRoomType[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [modalInfo, setModalInfo] = useState<ModalInfo>({
     modalType: "add",
     modalTitle: "",
     submitButtonText: "",
   });
-  const [editRoomInfo, setEditRoomInfo] = useState<RoomInfo>({
-    roomName: "",
+  const [editRoomInfo, setEditRoomInfo] = useState<RoomInfo | null>({
+    name: "",
     memberCount: "",
+    id: 0,
   });
+
+  const getAllRoomList = useCallback(async () => {
+    const roomList: any = await getAll();
+    setChatRoomList(roomList);
+  }, [getAll]);
 
   const handleOpenAddingModal = useCallback(() => {
     setIsOpenModal(true);
@@ -67,13 +76,13 @@ function ChatList() {
       }
 
       const { roomId } = currentTarget.dataset;
-
+      console.log(roomId);
       if (!roomId) {
         return;
       }
 
       // chatRoomList에서 roomId에 맞는 room 정보 가져와서 데이터 넣기
-      const roomInfo = chatList.find(
+      const roomInfo = chatRoomList.find(
         (chat) => chat.id === parseInt(roomId, 10)
       );
 
@@ -88,33 +97,49 @@ function ChatList() {
         submitButtonText: "수정",
       });
     },
-    []
+    [chatRoomList]
   );
 
   const handleCloseModal = useCallback(() => {
     setIsOpenModal(false);
-    setEditRoomInfo({ roomName: "", memberCount: "" });
+    setEditRoomInfo(null);
   }, []);
 
   const handleSubmitAddingRoom = useCallback(
-    async (roomName: string, memberCount: string) => {
-      const params = { roomName, memberCount };
-      //api 요청 보내기
+    async ({ name, memberCount }: RoomInfo) => {
+      try {
+        const response = await add({
+          name: name,
+          memberCount,
+        });
 
-      const response = await add({
-        name: roomName,
-        memberCount: parseInt(memberCount, 10),
-        id: 1,
-      });
-
-      console.log(response);
+        setChatRoomList((prev) =>
+          prev.concat({
+            name,
+            memberCount,
+            id: parseInt(response as string, 10),
+          })
+        );
+        handleCloseModal();
+      } catch (e) {
+        console.error(e);
+      }
     },
-    [add]
+    [add, handleCloseModal]
   );
 
   const handleSubmitUpdatingRoom = useCallback(
-    (id: string, roomName: string, memberCount: string) => {},
-    []
+    async ({ name, memberCount, id }: RoomInfo) => {
+      try {
+        await update({ id, name, memberCount });
+
+        setChatRoomList((prev) => prev.filter((item) => item.id !== id));
+        handleCloseModal();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [handleCloseModal, update]
   );
 
   const handleDeleteRoom = useCallback(
@@ -136,12 +161,8 @@ function ChatList() {
   );
 
   useEffect(() => {
-    getAll()
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => console.error(e));
-  }, [getAll]);
+    getAllRoomList();
+  }, [getAllRoomList]);
 
   return (
     <>
@@ -158,12 +179,12 @@ function ChatList() {
           </IconButton>
         </Header>
         <Main>
-          {chatList.map((chat) => (
+          {chatRoomList.map((chat) => (
             <ListItem
               key={chat.id}
               memberCount={chat.memberCount}
-              roomName={chat.roomName}
-              roomId={chat.id}
+              roomName={chat.name}
+              roomId={chat?.id || 0}
               onOpenEditModal={handleOpenEditingModal}
               onDeleteRoom={handleDeleteRoom}
             />
@@ -177,7 +198,9 @@ function ChatList() {
         modalTitle={modalInfo.modalTitle}
         submitButtonText={modalInfo.submitButtonText}
         onClose={handleCloseModal}
-        onSubmit={handleSubmitAddingRoom}
+        onSubmit={
+          editRoomInfo ? handleSubmitUpdatingRoom : handleSubmitAddingRoom
+        }
       />
     </>
   );
