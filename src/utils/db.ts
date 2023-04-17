@@ -117,6 +117,27 @@ export function getActions<T>(currentStoreName: string) {
           .catch(reject);
       });
     },
+    delete(value: any, key?: string) {
+      return new Promise((resolve, reject) => {
+        getConnection()
+          .then((db) => {
+            checkValidationTransition(db, currentStoreName, reject);
+            let transaction = createTransaction(
+              db,
+              "readwrite",
+              currentStoreName,
+              resolve,
+              reject
+            );
+            let objectStore = transaction.objectStore(currentStoreName);
+            let request = objectStore.delete(value);
+            request.onsuccess = (e: any) => {
+              resolve(e.target.result as T[]);
+            };
+          })
+          .catch(reject);
+      });
+    },
     getAll() {
       return new Promise((resolve, reject) => {
         getConnection()

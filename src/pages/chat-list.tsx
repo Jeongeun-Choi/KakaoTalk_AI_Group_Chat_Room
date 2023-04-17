@@ -39,7 +39,12 @@ const chatList = [
   },
 ];
 function ChatList() {
-  const { getAll, add, update } = getActions<ChatRoomType>("chat_room_list");
+  const {
+    getAll,
+    add,
+    update,
+    delete: deleteChat,
+  } = getActions<ChatRoomType>("chat_room_list");
 
   const [chatRoomList, setChatRoomList] = useState<ChatRoomType[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -143,7 +148,7 @@ function ChatList() {
   );
 
   const handleDeleteRoom = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
+    async (event: MouseEvent<HTMLButtonElement>) => {
       const { currentTarget } = event;
       if (!currentTarget || !currentTarget.dataset) {
         return;
@@ -155,9 +160,26 @@ function ChatList() {
         return;
       }
 
-      //alert(`${roomName} 방을 삭제하시겠습니까?`)
+      const chatRoom = chatRoomList.find(
+        (chatRoom) => chatRoom.id === parseInt(roomId, 10)
+      );
+
+      if (!chatRoom) {
+        return;
+      }
+
+      if (confirm(`${chatRoom.name} 방을 삭제하시겠습니까?`)) {
+        try {
+          await deleteChat(parseInt(roomId, 10));
+          setChatRoomList((prev) =>
+            prev.filter((item) => item.id === parseInt(roomId, 10))
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      }
     },
-    []
+    [chatRoomList, deleteChat]
   );
 
   useEffect(() => {
