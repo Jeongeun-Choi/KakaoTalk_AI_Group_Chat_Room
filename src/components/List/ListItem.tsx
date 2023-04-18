@@ -1,6 +1,7 @@
 import { SettingsIcon } from "@chakra-ui/icons";
 import { Box, IconButton } from "@chakra-ui/react";
 import styled from "@emotion/styled";
+import Link from "next/link";
 import { MouseEvent, useCallback } from "react";
 import MorePopover from "../Popover/MorePopover";
 
@@ -44,7 +45,7 @@ function ListItem({
 
   return (
     <ItemContainer height={height}>
-      <RoomInfo>
+      <RoomInfo href={`/chat-list/${roomId}`}>
         <span>{roomName}</span>
         <span>[{memberCount}]</span>
       </RoomInfo>
@@ -64,7 +65,7 @@ const ItemContainer = styled(Box)`
   align-items: center;
 `;
 
-const RoomInfo = styled.div`
+const RoomInfo = styled(Link)`
   display: flex;
   align-items: center;
 `;
