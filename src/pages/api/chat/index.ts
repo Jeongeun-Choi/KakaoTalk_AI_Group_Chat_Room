@@ -3,6 +3,8 @@ import { Configuration, OpenAIApi } from "openai";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const apiKey = req.body.apiKey;
+  const prompt = req.body.prompt;
+
   try {
     const configuration = new Configuration({
       apiKey,
@@ -10,8 +12,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const openai = new OpenAIApi(configuration);
     const response = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: "Say this is a test",
+      prompt,
       temperature: 0,
+      max_tokens: 500,
       // stop: ["Human:", "AI:"],
     });
     console.log("response", response);

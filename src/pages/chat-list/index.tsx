@@ -53,11 +53,7 @@ function ChatList() {
     modalTitle: "",
     submitButtonText: "",
   });
-  const [editRoomInfo, setEditRoomInfo] = useState<RoomInfo | null>({
-    name: "",
-    memberCount: "",
-    id: 0,
-  });
+  const [editRoomInfo, setEditRoomInfo] = useState<RoomInfo | null>(null);
 
   const getAllRoomList = useCallback(async () => {
     const roomList: any = await getAll();
@@ -81,7 +77,7 @@ function ChatList() {
       }
 
       const { roomId } = currentTarget.dataset;
-      console.log(roomId);
+
       if (!roomId) {
         return;
       }
@@ -112,17 +108,23 @@ function ChatList() {
 
   const handleSubmitAddingRoom = useCallback(
     async ({ name, memberCount }: RoomInfo) => {
+      const numberRoomArray = chatRoomList.map((chat) => chat?.id || 0);
+      let maxId = 0;
+      if (typeof numberRoomArray === "object" && numberRoomArray?.length > 0) {
+        maxId = Math.max(...numberRoomArray);
+      }
       try {
         const response = await add({
-          name: name,
+          name,
           memberCount,
+          id: maxId + 1,
         });
 
         setChatRoomList((prev) =>
           prev.concat({
             name,
             memberCount,
-            id: parseInt(response as string, 10),
+            id: maxId + 1,
           })
         );
         handleCloseModal();
@@ -130,7 +132,7 @@ function ChatList() {
         console.error(e);
       }
     },
-    [add, handleCloseModal]
+    [add, chatRoomList, handleCloseModal]
   );
 
   const handleSubmitUpdatingRoom = useCallback(
@@ -172,7 +174,7 @@ function ChatList() {
         try {
           await deleteChat(parseInt(roomId, 10));
           setChatRoomList((prev) =>
-            prev.filter((item) => item.id === parseInt(roomId, 10))
+            prev.filter((item) => item.id !== parseInt(roomId, 10))
           );
         } catch (e) {
           console.error(e);
@@ -184,7 +186,7 @@ function ChatList() {
 
   useEffect(() => {
     getAllRoomList();
-  }, [getAllRoomList]);
+  }, []);
 
   return (
     <>

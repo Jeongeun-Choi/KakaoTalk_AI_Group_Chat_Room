@@ -10,7 +10,7 @@ const config: DBConfigType = {
   stores: [
     {
       name: "api_key",
-      id: { keyPath: "id" },
+      id: { keyPath: "apiKey" },
       columns: [{ name: "apiKey", keyPath: "apiKey" }],
     },
     {
@@ -23,6 +23,15 @@ const config: DBConfigType = {
           keyPath: "memberCount",
           options: { unique: false },
         },
+      ],
+    },
+    {
+      name: "messages",
+      id: { keyPath: "id", autoIncrement: true },
+      columns: [
+        { name: "roomId", keyPath: "roomId", options: { unique: false } },
+        { name: "message", keyPath: "message", options: { unique: false } },
+        { name: "isMine", keyPath: "isMine", options: { unique: false } },
       ],
     },
   ],
@@ -41,7 +50,8 @@ function HomePage() {
         return apiKeys;
       })
       .then((apiKeys: any) => {
-        if (!apiKeys) {
+        if (apiKeys?.length === 0) {
+          router.push("/login");
           return;
         }
         if (apiKeys?.length > 0) {

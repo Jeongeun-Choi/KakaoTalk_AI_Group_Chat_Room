@@ -70,15 +70,15 @@ function LoginPage() {
     //   });
   }, [add, router]);
 
-  useEffect(() => {
-    setIndexedDB(config)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  });
+  // useEffect(() => {
+  //   setIndexedDB(config)
+  //     .then((res) => {
+  //       console.log(res);
+  //     })
+  //     .catch((e) => {
+  //       console.log(e);
+  //     });
+  // });
   return (
     <LoginContainer>
       <Main>
