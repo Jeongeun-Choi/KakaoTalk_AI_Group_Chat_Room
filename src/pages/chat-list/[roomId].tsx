@@ -1,22 +1,12 @@
-import styled from "@emotion/styled";
-import { AddIcon } from "@chakra-ui/icons";
-import ListItem from "@/components/List/ListItem";
-import { Box, IconButton } from "@chakra-ui/react";
-import EditRoomModal from "@/components/Modal/EditRoomModal";
-import {
-  CSSProperties,
-  MouseEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { getActions } from "@/utils/db";
+import styled from "@emotion/styled";
+import { Box } from "@chakra-ui/react";
 
 function ChatRoom() {
   const { getAll: getApiKeys } = getActions("api_key");
-  const { getAll, add } = getActions("messages");
+  const { add, getManyByKey: getMessage } = getActions("messages");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -59,9 +49,11 @@ function ChatRoom() {
   }, [apiKey, roomId, add]);
 
   useEffect(() => {
-    getAll().then((res) => {
-      setMessageList(res);
-    });
+    if (roomId) {
+      getMessage("roomId", roomId as string).then((res) => {
+        setMessageList(res);
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -72,20 +64,90 @@ function ChatRoom() {
   }, []);
 
   return (
-    <>
-      <ul>
-        {messageList.map((message, index) => (
-          <li key={index} style={{ color: message?.isMine ? "black" : "blue" }}>
-            {message?.message}
-          </li>
+    <ChatContainer>
+      <ChatList>
+        {messageList?.map((message, index) => (
+          <Chat key={index} isMine={message.isMine}>
+            <MessageText>
+              <p>{message?.message}</p>
+            </MessageText>
+          </Chat>
         ))}
-      </ul>
-      <div>
+      </ChatList>
+      <SendContainer>
         <input ref={inputRef} placeholder="메시지를 보내세요." />
         <button onClick={handleSubmitChat}>전송</button>
-      </div>
-    </>
+      </SendContainer>
+    </ChatContainer>
   );
 }
 
 export default ChatRoom;
+
+const ChatContainer = styled(Box)`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ChatList = styled.ul`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  list-style: none;
+`;
+
+const Chat = styled.li<{ isMine: boolean }>`
+  display: flex;
+  position: relative;
+  margin: 10px;
+  justify-content: ${(props) => (props.isMine ? "flex-end" : "flex-start")};
+  color: ${(props) => (props.isMine ? "black" : "blue")};
+`;
+
+const MessageText = styled.div`
+  display: inline-block;
+  position: relative;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 10px;
+  word-wrap: break-word;
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+  }
+`;
+
+const SendContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  padding: 10px;
+  position: relative;
+  bottom: 0;
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+
+  button {
+    background-color: #4caf50;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+`;
