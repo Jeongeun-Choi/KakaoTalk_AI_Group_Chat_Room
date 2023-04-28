@@ -68,7 +68,7 @@ function ChatRoom() {
       <ChatList>
         {messageList?.map((message, index) => (
           <Chat key={index} isMine={message.isMine}>
-            <MessageText>
+            <MessageText isMine={message.isMine}>
               <p>{message?.message}</p>
             </MessageText>
           </Chat>
@@ -98,6 +98,7 @@ const ChatList = styled.ul`
   flex-direction: column;
   padding: 10px;
   list-style: none;
+  overflow-y: scroll;
 `;
 
 const Chat = styled.li<{ isMine: boolean }>`
@@ -105,14 +106,14 @@ const Chat = styled.li<{ isMine: boolean }>`
   position: relative;
   margin: 10px;
   justify-content: ${(props) => (props.isMine ? "flex-end" : "flex-start")};
-  color: ${(props) => (props.isMine ? "black" : "blue")};
+  color: ${(props) => (props.isMine ? "black" : "white")};
 `;
 
-const MessageText = styled.div`
+const MessageText = styled.div<{ isMine: boolean }>`
   display: inline-block;
   position: relative;
-  background-color: #fff;
-  border-radius: 20px;
+  background-color: ${(props) => (props.isMine ? "#fff" : "#000")};
+  border-radius: 10px;
   padding: 10px;
   word-wrap: break-word;
 
@@ -127,7 +128,7 @@ const SendContainer = styled.div`
   display: flex;
   align-items: center;
   background-color: #f5f5f5;
-  border-radius: 20px;
+  /* border-radius: 20px; */
   padding: 10px;
   position: relative;
   bottom: 0;
@@ -142,9 +143,9 @@ const SendContainer = styled.div`
   }
 
   button {
-    background-color: #4caf50;
+    background-color: #eaafb9;
     border: none;
-    border-radius: 20px;
+    border-radius: 10px;
     color: #fff;
     font-size: 16px;
     padding: 10px 20px;
