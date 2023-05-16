@@ -32,6 +32,7 @@ const config: DBConfigType = {
         { name: "roomId", keyPath: "roomId", options: { unique: false } },
         { name: "message", keyPath: "message", options: { unique: false } },
         { name: "isMine", keyPath: "isMine", options: { unique: false } },
+        { name: "time", keyPath: "time", options: { unique: false } },
       ],
     },
   ],
