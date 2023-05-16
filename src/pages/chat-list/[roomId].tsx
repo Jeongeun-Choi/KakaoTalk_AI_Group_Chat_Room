@@ -1,8 +1,22 @@
-import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/router";
 import { getActions } from "@/utils/db";
 import styled from "@emotion/styled";
 import { Box } from "@chakra-ui/react";
+import { css } from "@emotion/react";
+import { formatDate } from "@/utils/time";
+
+type ChatStyleType = {
+  isMine: boolean;
+  isLoading?: boolean;
+};
 
 const initMessage = {
   roomId: -1,
@@ -101,14 +115,19 @@ function ChatRoom() {
     <ChatContainer>
       <ChatList>
         {messageList?.map((message, index) => (
-          <Chat key={index} isMine={message.isMine}>
-            <MessageText
-              isMine={message.isMine}
-              className={message.isLoading && "bubble-loader"}
-            >
-              <p>{message?.message}</p>
-            </MessageText>
-          </Chat>
+          <Fragment key={index}>
+            <Chat isMine={message.isMine}>
+              <MessageText
+                isMine={message.isMine}
+                className={message?.isLoading && "bubble-loader"}
+              >
+                <p>{message?.message}</p>
+              </MessageText>
+            </Chat>
+            <ChatTime isMine={message?.isMine}>
+              {formatDate(message?.time, "hh:mm")}
+            </ChatTime>
+          </Fragment>
         ))}
       </ChatList>
       <SendContainer>
@@ -139,7 +158,7 @@ const ChatList = styled.ul`
   flex-direction: column;
   padding: 10px;
   list-style: none;
-  overflow-y: scroll;
+  overflow-y: auto;
   /* 말풍선 메시지 로딩 애니메이션 */
   @keyframes message-loading {
     0% {
@@ -174,15 +193,15 @@ const ChatList = styled.ul`
   }
 `;
 
-const Chat = styled.li<{ isMine: boolean }>`
+const Chat = styled.li<ChatStyleType>`
   display: flex;
   position: relative;
-  margin: 10px;
+  margin: 16px 10px 10px 10px;
   justify-content: ${(props) => (props.isMine ? "flex-end" : "flex-start")};
   color: ${(props) => (props.isMine ? "black" : "white")};
 `;
 
-const MessageText = styled.div<{ isMine: boolean }>`
+const MessageText = styled.div<ChatStyleType>`
   display: inline-block;
   position: relative;
   background-color: ${(props) => (props.isMine ? "#fff" : "#000")};
@@ -194,6 +213,20 @@ const MessageText = styled.div<{ isMine: boolean }>`
     margin: 0;
     line-height: 1.5;
   }
+`;
+
+const ChatTime = styled.span<ChatStyleType>`
+  text-align: ${({ isMine }) => (isMine ? "right" : "left")};
+  ${({ isMine }) =>
+    isMine
+      ? css`
+          margin-right: 10px;
+        `
+      : css`
+          margin-left: 10px;
+        `}
+  margin-top: -8px;
+  font-size: 12px;
 `;
 
 const SendContainer = styled.div`
