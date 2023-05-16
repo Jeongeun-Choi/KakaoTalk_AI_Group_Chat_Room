@@ -63,6 +63,8 @@ function ChatRoom() {
       setMessageList((prev) => prev.concat([aiMessage]));
     } catch (e) {
       console.error(e);
+      window.alert("알 수 없는 오류 입니다. 메시지를 다시 입력해주세요.");
+      setMessageList((prev) => prev.slice(0, prev.length - 2));
     } finally {
       // 임의 메시지 넣은거 삭제
       setMessageList((prev) => prev.filter((value) => !value.isLoading));
