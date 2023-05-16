@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { getActions } from "@/utils/db";
 import styled from "@emotion/styled";
@@ -22,11 +22,18 @@ function ChatRoom() {
     }
 
     const value = inputRef.current.value;
-
     if (!value) {
       return;
     }
 
+    const mineMessage = {
+      roomId,
+      message: value,
+      isMine: true,
+      time: new Date(),
+    };
+    inputRef.current.value = "";
+    setMessageList((prev) => prev.concat([mineMessage]));
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -36,17 +43,31 @@ function ChatRoom() {
       const data = await response.json();
       const text = data.response?.text;
 
-      const aiMessage = { roomId, message: text, isMine: false };
-      const mineMessage = { roomId, message: value, isMine: true };
+      const aiMessage = {
+        roomId,
+        message: text,
+        isMine: false,
+        time: new Date(),
+      };
 
       await add(mineMessage);
       await add(aiMessage);
-      setMessageList((prev) => prev.concat([mineMessage, aiMessage]));
-      inputRef.current.value = "";
+      setMessageList((prev) => prev.concat([aiMessage]));
     } catch (e) {
       console.error(e);
     }
   }, [apiKey, roomId, add]);
+
+  const handleKeyDownEnter = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      const code = e.code;
+
+      if (code === "Enter" && !e.nativeEvent.isComposing) {
+        handleSubmitChat();
+      }
+    },
+    [handleSubmitChat]
+  );
 
   useEffect(() => {
     if (roomId) {
@@ -75,7 +96,11 @@ function ChatRoom() {
         ))}
       </ChatList>
       <SendContainer>
-        <input ref={inputRef} placeholder="메시지를 보내세요." />
+        <input
+          ref={inputRef}
+          placeholder="메시지를 보내세요."
+          onKeyDown={handleKeyDownEnter}
+        />
         <button onClick={handleSubmitChat}>전송</button>
       </SendContainer>
     </ChatContainer>
