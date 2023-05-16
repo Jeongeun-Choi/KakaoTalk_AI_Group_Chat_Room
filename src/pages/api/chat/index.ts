@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // stop: ["Human:", "AI:"],
     });
     console.log("response", response);
-    res.status(200).json({ response: response.data.choices[0] });
+    res.status(200).json({ response: response.data });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: "error" });

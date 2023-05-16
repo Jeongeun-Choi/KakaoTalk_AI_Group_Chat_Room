@@ -38,7 +38,7 @@ function ChatRoom() {
       roomId,
       message: value,
       isMine: true,
-      time: new Date(),
+      time: new Date().getTime(),
     };
     inputRef.current.value = "";
     setMessageList((prev) => prev.concat([mineMessage, initMessage]));
@@ -49,12 +49,13 @@ function ChatRoom() {
         headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
-      const text = data.response?.text;
+      const text = data.response?.choices[0].text;
+
       const aiMessage = {
         roomId,
         message: text,
         isMine: false,
-        time: new Date(),
+        time: data.response?.created * 1000,
       };
 
       await add(mineMessage);
