@@ -4,6 +4,14 @@ import { getActions } from "@/utils/db";
 import styled from "@emotion/styled";
 import { Box } from "@chakra-ui/react";
 
+const initMessage = {
+  roomId: -1,
+  message: "",
+  isMine: false,
+  time: new Date(),
+  isLoading: true,
+};
+
 function ChatRoom() {
   const { getAll: getApiKeys } = getActions("api_key");
   const { add, getManyByKey: getMessage } = getActions("messages");
@@ -33,7 +41,7 @@ function ChatRoom() {
       time: new Date(),
     };
     inputRef.current.value = "";
-    setMessageList((prev) => prev.concat([mineMessage]));
+    setMessageList((prev) => prev.concat([mineMessage, initMessage]));
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -42,7 +50,6 @@ function ChatRoom() {
       });
       const data = await response.json();
       const text = data.response?.text;
-
       const aiMessage = {
         roomId,
         message: text,
@@ -55,6 +62,9 @@ function ChatRoom() {
       setMessageList((prev) => prev.concat([aiMessage]));
     } catch (e) {
       console.error(e);
+    } finally {
+      // 임의 메시지 넣은거 삭제
+      setMessageList((prev) => prev.filter((value) => !value.isLoading));
     }
   }, [apiKey, roomId, add]);
 
@@ -89,7 +99,10 @@ function ChatRoom() {
       <ChatList>
         {messageList?.map((message, index) => (
           <Chat key={index} isMine={message.isMine}>
-            <MessageText isMine={message.isMine}>
+            <MessageText
+              isMine={message.isMine}
+              className={message.isLoading && "bubble-loader"}
+            >
               <p>{message?.message}</p>
             </MessageText>
           </Chat>
@@ -124,6 +137,38 @@ const ChatList = styled.ul`
   padding: 10px;
   list-style: none;
   overflow-y: scroll;
+  /* 말풍선 메시지 로딩 애니메이션 */
+  @keyframes message-loading {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(360deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+  /* 말풍선 메시지 로딩 스타일 */
+  .bubble-loader {
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    height: 40px;
+  }
+
+  .bubble-loader:before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 36px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 4px solid #ccc;
+    border-top-color: #888;
+    animation: message-loading 1s infinite linear;
+  }
 `;
 
 const Chat = styled.li<{ isMine: boolean }>`
