@@ -10,8 +10,12 @@ const config: DBConfigType = {
   stores: [
     {
       name: "api_key",
-      id: { keyPath: "apiKey" },
-      columns: [{ name: "apiKey", keyPath: "apiKey" }],
+      id: { keyPath: "id" },
+      columns: [
+        { name: "apiKey", keyPath: "apiKey" },
+        { name: "id", keyPath: "id" },
+        { name: "nickname", keyPath: "nickname" },
+      ],
     },
     {
       name: "chat_room_list",
@@ -33,6 +37,7 @@ const config: DBConfigType = {
         { name: "message", keyPath: "message", options: { unique: false } },
         { name: "isMine", keyPath: "isMine", options: { unique: false } },
         { name: "time", keyPath: "time", options: { unique: false } },
+        { name: "userId", keyPath: "userId", options: { unique: false } },
       ],
     },
   ],

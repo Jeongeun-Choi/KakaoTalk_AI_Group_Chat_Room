@@ -1,73 +1,61 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { InputBox } from "@/components/Input";
 import { InputBoxHandle } from "@/components/Input/types";
 import { Button, Link } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 import { getActions } from "@/utils/db";
-import setIndexedDB from "@/hooks/useIndexedDBStore";
-import { DBConfigType } from "@/globalType";
 
-const config: DBConfigType = {
-  databaseName: "AI_CHAT",
-  version: 1,
-  stores: [
-    {
-      name: "api_key",
-      id: { keyPath: "apiKey" },
-      columns: [{ name: "apiKey", keyPath: "apiKey" }],
-    },
-    {
-      name: "chat_room_list",
-      id: { keyPath: "id", autoIncrement: true },
-      columns: [
-        { name: "name", keyPath: "name", options: { unique: false } },
-        {
-          name: "memberCount",
-          keyPath: "memberCount",
-          options: { unique: false },
-        },
-      ],
-    },
-  ],
+type IsInvalidType = {
+  apiKey: boolean;
+  userId: boolean;
+};
+
+const errorText = {
+  apiKey: "잘못된 형식입니다.",
+  userId: "잘못된 형식입니다.",
 };
 
 function LoginPage() {
   const { add } = getActions("api_key");
   const router = useRouter();
-  const inputRef = useRef<InputBoxHandle>(null);
+  const apiKeyinputRef = useRef<InputBoxHandle>(null);
+  const idInputRef = useRef<InputBoxHandle>(null);
+  const nicknameInputRef = useRef<InputBoxHandle>(null);
+  const [isInvalid, setIsInvalid] = useState<IsInvalidType>({
+    apiKey: false,
+    userId: false,
+  });
 
   const handleSubmitResult = useCallback(async () => {
-    if (!inputRef.current) {
+    if (
+      !apiKeyinputRef.current ||
+      !idInputRef.current ||
+      !nicknameInputRef.current
+    ) {
       return;
     }
 
-    const apiKey = inputRef.current.getInputValue();
+    const apiKey = apiKeyinputRef.current.getInputValue();
+    const userId = idInputRef.current.getInputValue();
+    const nickname = nicknameInputRef.current.getInputValue();
 
-    if (!apiKey) {
+    if (!apiKey || !userId) {
+      setIsInvalid({ apiKey: !apiKey, userId: !userId });
       return;
     }
 
     try {
-      console.log();
-      const response = await add({ apiKey });
+      const response = await add({
+        apiKey,
+        userId,
+        nickname: nickname || "익명", // 닉네임 추가 안했을 경우 '익명'으로 설정
+      });
       console.log(response);
       router.push("/chat-list");
     } catch (e) {
       console.error(e);
     }
-    // fetch("/api/login", {
-    //   method: "POST",
-    //   body: JSON.stringify({ apiKey }),
-    //   headers: { "Content-Type": "application/json" },
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //   })
-    //   .catch((err) => {
-    //     console.log("error", err);
-    //   });
   }, [add, router]);
 
   // useEffect(() => {
@@ -83,10 +71,26 @@ function LoginPage() {
     <LoginContainer>
       <Main>
         <div>이미지 로고..</div>
-        <InputBox ref={inputRef} label="API Key" variant="filled" />
+        <InputBox
+          ref={apiKeyinputRef}
+          label="API Key"
+          variant="filled"
+          isRequired
+          isInvalid={isInvalid.apiKey}
+          errorText={errorText.apiKey}
+        />
+        <InputBox
+          ref={idInputRef}
+          label="아이디"
+          variant="filled"
+          isRequired
+          isInvalid={isInvalid.userId}
+          errorText={errorText.userId}
+        />
+        <InputBox ref={nicknameInputRef} label="닉네임" variant="filled" />
       </Main>
       <Footer>
-        <Button onClick={handleSubmitResult}>Login</Button>
+        <Button onClick={handleSubmitResult}>로그인</Button>
         <Link>Key 발급받는법</Link>
       </Footer>
     </LoginContainer>
@@ -106,7 +110,15 @@ const LoginContainer = styled.div`
 const Main = styled.main`
   width: 90%;
   position: relative;
-  top: 45%;
+  top: 40%;
+
+  div {
+    margin-bottom: 10px;
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 const Footer = styled.footer`
