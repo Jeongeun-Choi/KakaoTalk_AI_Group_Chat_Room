@@ -7,7 +7,15 @@ import { InputBoxHandle, InputBoxProps } from "./types";
 
 const InputBox = forwardRef<InputBoxHandle, InputBoxProps>(
   (
-    { label, placeholder, placeholderStyle, isInvalid, errorText, ...rest },
+    {
+      label,
+      placeholder,
+      placeholderStyle,
+      isInvalid,
+      errorText,
+      isRequired,
+      ...rest
+    },
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -41,12 +49,15 @@ const InputBox = forwardRef<InputBoxHandle, InputBoxProps>(
 
     return (
       <Box>
-        <Text>{label}</Text>
+        <InputLabel>
+          {label} {isRequired && <span>*</span>}
+        </InputLabel>
         <Input
           ref={inputRef}
           placeholder={placeholder}
           _placeholder={placeholderStyle}
           isInvalid={isInvalid}
+          isRequired={isRequired}
           {...rest}
         />
         {isInvalid && <ErrorText>{errorText}</ErrorText>}
@@ -56,6 +67,12 @@ const InputBox = forwardRef<InputBoxHandle, InputBoxProps>(
 );
 
 export default InputBox;
+
+const InputLabel = styled(Text)`
+  span {
+    color: crimson;
+  }
+`;
 
 const ErrorText = styled(Text)`
   font-size: 12px;
