@@ -249,5 +249,4 @@ const Header = styled(Box)`
 
 const Main = styled.main`
   width: 100%;
-  padding: 10px;
 `;
